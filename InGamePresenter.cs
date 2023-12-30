@@ -223,6 +223,8 @@ public class InGamePresenter : MonoBehaviour
 
         _model.SetState(InGameEnum.State.Run);
 
+        _score.Show();
+
 
 
     }
