@@ -10,7 +10,6 @@ public static class InGameEnum
         WaitStart = 1,
         Run = 2,
         Hit = 3,
-        Dead = 4
 
     }
 

@@ -16,6 +16,10 @@ public class PlayerPresenter : MonoBehaviour
     /// </summary>
     private PlayerModel _playerModel;
 
+    public float X => _playerModel.X;
+
+    public float Y => _playerModel.Y;
+
 
     /// <summary>
     /// Update
@@ -39,7 +43,7 @@ public class PlayerPresenter : MonoBehaviour
 
         _playerView.Initialized();
 
-        EventDirectionChanged();
+        EventDirectionChanged(state);
 
         Bind();
 
@@ -63,7 +67,7 @@ public class PlayerPresenter : MonoBehaviour
 
 
     //Subscribe the Change of Diection
-    private void EventDirectionChanged()
+    private void EventDirectionChanged(InGameEnum.State state)
     {
 
 
@@ -71,7 +75,7 @@ public class PlayerPresenter : MonoBehaviour
             .Subscribe(direction => {
                 float deltaTime = Time.deltaTime;
                 _playerModel
-                .UpdateMove(deltaTime);
+                .UpdateMove(deltaTime, state);
             })
             .AddTo(this);
 
@@ -80,7 +84,7 @@ public class PlayerPresenter : MonoBehaviour
 
     private void CheckDirection(InGameEnum.State state)
     {
-        if (state == InGameEnum.State.WaitStart || state == InGameEnum.State.Dead) return;
+        if (state == InGameEnum.State.WaitStart || state == InGameEnum.State.Hit) return;
 
 
         if (Input.GetKey(KeyCode.W))
@@ -94,6 +98,22 @@ public class PlayerPresenter : MonoBehaviour
         else
             _playerModel.SetDirection(PlayerEnum.PlayerDirection.None);
 
+
+
+    }
+
+    public void DeadAnimation()
+    {
+
+        _playerView.DeadAnimation().Forget();
+
+    }
+
+    public void Reset()
+    {
+
+        _playerModel.Reset();
+        _playerView.gameObject.SetActive(true);
 
 
     }

@@ -2,6 +2,8 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEditor.PackageManager.Requests;
 using Unity.VisualScripting;
+using Cysharp.Threading.Tasks;
+using System;
 
 public class PlayerView : MonoBehaviour
 {
@@ -24,6 +26,10 @@ public class PlayerView : MonoBehaviour
     private Sprite[] _sprites;
 
     private Transform _cacheTransform;
+
+    [SerializeField]
+    private Sprite[] _deadSprite;
+
 
     /// <summary>
     /// Array Index
@@ -49,7 +55,7 @@ public class PlayerView : MonoBehaviour
     /// </summary>
     public void Reset()
     {
-;
+        ;
         _cacheTransform = transform;
         _indexOfSprites = 0;
         _spriteChangeTimer = 0;
@@ -66,7 +72,9 @@ public class PlayerView : MonoBehaviour
 
     private void UpdateView(float deltaTime, InGameEnum.State state)
     {
-        
+        if (state == InGameEnum.State.Hit) return;
+
+
         _spriteChangeTimer -= deltaTime;
         if(_spriteChangeTimer < 0f)
         {
@@ -103,6 +111,21 @@ public class PlayerView : MonoBehaviour
         var position = _cacheTransform.localPosition;
         position.y = y;
         _cacheTransform.localPosition = position;
+
+    }
+
+    public async UniTaskVoid DeadAnimation()
+    {
+        for(int i = 0; i < _deadSprite.Length; i++)
+        {
+
+            _image.sprite = _deadSprite[i];
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
+
+        }
+
+        gameObject.SetActive(false);
 
     }
 

@@ -23,6 +23,14 @@ public class InGameView : MonoBehaviour
     [SerializeField]
     private Button _tapButton;
 
+    /// <summary>
+    /// Bomb Generate
+    /// </summary>
+    [SerializeField]
+    private Transform _bombContainer;
+
+    public Transform BombContainer => _bombContainer;
+
     public IObservable<Unit> OnTapButtonClicked => _tapButton.OnClickAsObservable();
 
     private float fadeTime = 2f;

@@ -22,6 +22,27 @@ public class InGamePresenter : MonoBehaviour
     private PlayerPresenter _player;
 
 
+    /// <summary>
+    /// Bomb Array
+    /// </summary>
+    private BombPresenter[] _bombs;
+
+    /// <summary>
+    /// Bomb Prefab
+    /// </summary>
+    [SerializeField]
+    private GameObject _bombPrefab;
+
+    [SerializeField]
+    private ScorePresenter _score;
+
+    /// <summary>
+    /// Finish
+    /// </summary>
+    [SerializeField]
+    private InGameFinishView _finishView;
+
+
     // Start is called before the first frame update
     void Start()
 
@@ -37,19 +58,68 @@ public class InGamePresenter : MonoBehaviour
 
         _player.Initialize(_model.State);
 
-        SetEvents();
+        _score.Initialize();
 
+        _finishView.Initilize();
+
+        SpawnBombsAsync().Forget();
+
+        SetEvents();
 
         //Start of Background and Title
         _view.FadeIn().Forget();
 
-        
+        Bind();
+
+
+    }
+
+    private void Bind()
+    {
+
+        _model.StateProp
+            .Subscribe(state=> {
+
+                StartCoroutine(EndState(state));
+            
+            })
+            .AddTo(gameObject);
+
+
+    }
+
+    private IEnumerator EndState(InGameEnum.State state)
+    {
+
+        if(state == InGameEnum.State.Hit)
+        {
+            _player.DeadAnimation();
+            _score.Hide();
+            foreach (var bomb in _bombs)
+            {
+                if (bomb._isHitOne == true)
+                    bomb.Explosion();
+            }
+
+            yield return new WaitForSeconds(1f);
+
+            _finishView.SetResultScore(_score.Score);
+            _finishView.ShowAsync().Forget();
+
+        }
 
 
     }
 
     private void SetEvents()
     {
+
+        foreach(var bomb in _bombs)
+        {
+            bomb.AddScoreCallback += () => _score.AddScore();
+        }
+
+
 
         _view.OnTapButtonClicked
             .Subscribe(_ =>
@@ -60,6 +130,13 @@ public class InGamePresenter : MonoBehaviour
             })
             .AddTo(this);
 
+        _finishView.RestartButton.OnClickAsObservable()
+            .Subscribe(_ => GameRestart())
+            .AddTo(gameObject);
+
+        _finishView.ReturnButton.OnClickAsObservable()
+            .Subscribe(_ => ReturnTitle())
+            .AddTo(gameObject);
 
     }
 
@@ -67,9 +144,54 @@ public class InGamePresenter : MonoBehaviour
     {
 
         _model.SetState(InGameEnum.State.Run);
+        _score.Show();
         
 
     }
+
+    private async UniTaskVoid SpawnBombsAsync()
+    {
+
+        _bombs = new BombPresenter[InGameConst.NumberOfBombs];
+        for(int i = 0; i < InGameConst.NumberOfBombs; i++)
+        {
+            var bombClone = Instantiate(_bombPrefab, _view.BombContainer);
+            _bombs[i] = bombClone.GetComponent<BombPresenter>();
+            _bombs[i].Initialize(InGameConst.TimeToGenerateBomb * i);
+
+        }
+
+        await UniTask.WaitUntil(() => _model.State == InGameEnum.State.Run);
+
+        for (int i = 0; i < InGameConst.NumberOfBombs; i++)
+        {
+            _bombs[i].gameObject.SetActive(true);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(InGameConst.TimeToGenerateBomb));
+        }
+
+
+    }
+
+    private void CheckHit()
+    {
+
+        foreach( var bomb in _bombs)
+        {
+            if (bomb.IsHit(_player.X, _player.Y))
+            {
+                _model.SetState(InGameEnum.State.Hit);
+                return;
+            }
+        }
+
+    }
+
+
+
+
+
+
 
     // Update is called once per frame
     void Update()
@@ -80,13 +202,63 @@ public class InGamePresenter : MonoBehaviour
         _view.ManualUpdate(deltaTime);
 
         _player.ManualUpdate(deltaTime,_model.State);
+
+        foreach(var bomb in _bombs)
+        {
+            if(_model.State == InGameEnum.State.Run)
+                bomb.ManualUpdate(deltaTime);
+        }
+           
+
+        CheckHit();
         
 
     }
 
 
+    private void GameRestart()
+    {
+
+        ResetAll();
+
+        _model.SetState(InGameEnum.State.Run);
 
 
+
+    }
+
+    private void ReturnTitle()
+    {
+
+
+        ResetAll();
+
+        _model.SetState(InGameEnum.State.WaitStart);
+
+        _score.Hide();
+
+        _view.FadeIn().Forget();
+
+  
+
+    }
+
+    private void ResetAll()
+    {
+
+        for (int i = 0; i < _bombs.Length; i++)
+        {
+            _bombs[i].Reset(i * InGameConst.TimeToGenerateBomb);
+        }
+
+        _player.Reset();
+
+        _score.Reset();
+
+        _finishView.Hide();
+
+
+    }
 
 
 }

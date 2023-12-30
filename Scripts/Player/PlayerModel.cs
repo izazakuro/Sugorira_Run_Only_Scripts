@@ -124,7 +124,7 @@ public class PlayerModel
     public void ManualUpdate(float deltaTime, InGameEnum.State state)
     {
 
-        UpdateMove(deltaTime);
+        UpdateMove(deltaTime, state);
 
     }
 
@@ -135,10 +135,13 @@ public class PlayerModel
 
     }
 
-    public void UpdateMove(float deltaTime)
+    public void UpdateMove(float deltaTime, InGameEnum.State state)
 
     {
 
+        if (state == InGameEnum.State.Hit) return;
+
+    
         _checkBoundry = IsBoundry();
         if ((_checkBoundry == true && X == PlayerConst.XLeftBoundry && _direction.Value == PlayerEnum.PlayerDirection.Left) ||
             (_checkBoundry == true && X == PlayerConst.XRightBoundry && _direction.Value == PlayerEnum.PlayerDirection.Right) ||
@@ -187,6 +190,18 @@ public class PlayerModel
         }
 
         
+
+    }
+
+    public void Reset()
+    {
+
+        _xProp.Value = PlayerConst.PlayerStartX;
+        _yProp.Value = PlayerConst.PlayerStartY;
+
+        SetDirection(PlayerEnum.PlayerDirection.None);
+        
+
 
     }
 

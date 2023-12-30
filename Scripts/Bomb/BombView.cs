@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
+using Cysharp.Threading.Tasks;
 
 public class BombView : MonoBehaviour
 {
@@ -16,14 +18,23 @@ public class BombView : MonoBehaviour
     [SerializeField]
     private Sprite[] _bombSprites;
 
+    //Explosion Array
+    [SerializeField]
+    private Sprite[] _explosionSprites;
+
+    private int _explosionIndex;
+
     private int _arrayIndex;
 
     private float _spriteChangeTimer;
 
+    //Transform Cache
+    private Transform _cachedTransform;
+
 
     public void Initialize()
     {
-
+        _cachedTransform = transform;
         Reset();
 
     }
@@ -36,17 +47,17 @@ public class BombView : MonoBehaviour
     
     }
 
-    public void ManualUpdate(float deltaTime, InGameEnum.State state)
+    public void ManualUpdate(float deltaTime)
     {
 
-        UpdateView(deltaTime, state);
+        UpdateView(deltaTime);
 
     }
 
 
-    private void UpdateView(float deltaTime, InGameEnum.State state)
+    private void UpdateView(float deltaTime)
     {
-
+        
         _spriteChangeTimer -= deltaTime;
         if (_spriteChangeTimer < 0f)
         {
@@ -62,6 +73,42 @@ public class BombView : MonoBehaviour
     {
         return (self + value + max) % max;
     }
+
+    public void SetX(float x)
+    {
+
+        var position = _cachedTransform.localPosition;
+        position.x = x;
+        _cachedTransform.localPosition = position;
+
+
+    }
+
+    public void SetY(float y)
+    {
+
+        var position = _cachedTransform.localPosition;
+        position.y = y;
+        _cachedTransform.localPosition = position;
+
+    }
+
+    public async UniTaskVoid ExplosionAsync()
+    {
+
+        for(int i = 0; i < _explosionSprites.Length; i++)
+        {
+
+            _bombImage.sprite = _explosionSprites[i];
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
+
+        }
+
+       
+
+    }
+
 
 
 }

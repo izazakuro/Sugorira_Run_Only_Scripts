@@ -20,6 +20,10 @@ public static class PlayerConst
 
     public const float YUpBoundry = 610f;
 
+    public const float PlayerWidth = 2.5f * 40;
+
+    public const float PlayerHeight = 2.5f * 46;
+
 
 
 
