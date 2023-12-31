@@ -27,8 +27,8 @@ public class PlayerPresenter : MonoBehaviour
     public void ManualUpdate(float deltaTime, InGameEnum.State state)
     {
 
-        _playerView.ManualUpdate(deltaTime, state);
-        _playerModel.ManualUpdate(deltaTime, state);
+        _playerView.ManualUpdate(deltaTime);
+        _playerModel.ManualUpdate(deltaTime);
         CheckDirection(state);
 
 
@@ -75,7 +75,7 @@ public class PlayerPresenter : MonoBehaviour
             .Subscribe(direction => {
                 float deltaTime = Time.deltaTime;
                 _playerModel
-                .UpdateMove(deltaTime, state);
+                .UpdateMove(deltaTime);
             })
             .AddTo(this);
 

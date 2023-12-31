@@ -121,10 +121,10 @@ public class PlayerModel
 
     }
 
-    public void ManualUpdate(float deltaTime, InGameEnum.State state)
+    public void ManualUpdate(float deltaTime)
     {
 
-        UpdateMove(deltaTime, state);
+        UpdateMove(deltaTime);
 
     }
 
@@ -135,11 +135,9 @@ public class PlayerModel
 
     }
 
-    public void UpdateMove(float deltaTime, InGameEnum.State state)
+    public void UpdateMove(float deltaTime)
 
     {
-
-        if (state == InGameEnum.State.Hit) return;
 
     
         _checkBoundry = IsBoundry();

@@ -8,9 +8,9 @@ public class InGameFinishView : MonoBehaviour
 {
     //GameOver Image
     [SerializeField]
-    private Image _image;
+    private Image _gameOverImage;
 
-    public Image Image => _image;
+    public Image GameOverImage => _gameOverImage;
 
     [SerializeField]
     private Image _resultImage;
@@ -28,11 +28,9 @@ public class InGameFinishView : MonoBehaviour
     private Button _returnButton;
     public Button ReturnButton => _returnButton;
 
-    [SerializeField]
-    private Image _restartButtonImage;
 
     [SerializeField]
-    private Image _returnToTitle;
+    private CanvasGroup _buttonGroup;
 
     private static readonly Color _transparent = new Color(1f, 1f, 1f, 0f);
 
@@ -46,15 +44,13 @@ public class InGameFinishView : MonoBehaviour
 
         Hide();
 
+
     }
 
     public void Hide()
     {
-        _image.color = _transparent;
-        _restartButtonImage.color = _transparent;
-        _returnToTitle.color = _transparent;
-        _resultImage.color = _transparent;
-        _resultScore.color = _transparent;
+        _buttonGroup.alpha = 0f;
+        _gameOverImage.color = _transparent;
         _restartButton.gameObject.SetActive(false);
         _returnButton.gameObject.SetActive(false);
 
@@ -64,11 +60,8 @@ public class InGameFinishView : MonoBehaviour
     public async UniTaskVoid ShowAsync()
     {
         Sequence fadeIn = DOTween.Sequence();
-        await fadeIn.Append(_image.DOFade(1f, _fadeTime))
-        .Append(_restartButtonImage.DOFade(1f, _fadeTime))
-        .Join(_returnToTitle.DOFade(1f, _fadeTime))
-        .Join(_resultImage.DOFade(1f, _fadeTime))
-        .Join(_resultScore.DOFade(1f,_fadeTime))
+        await fadeIn.Append(_gameOverImage.DOFade(1f, _fadeTime))
+        .Append(_buttonGroup.DOFade(1f, _fadeTime))
         .Play()
         .OnComplete(() =>
         {
@@ -84,7 +77,7 @@ public class InGameFinishView : MonoBehaviour
     public void SetResultScore(int score)
     {
 
-        _resultScore.text = "Score:" + score.ToString();
+        _resultScore.text = score.ToString();
 
     }
 

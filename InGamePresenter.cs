@@ -77,36 +77,33 @@ public class InGamePresenter : MonoBehaviour
     private void Bind()
     {
 
-        _model.StateProp
-            .Subscribe(state=> {
+        _model.StateProp.Where(state => state == InGameEnum.State.Hit)
+            .Subscribe(_ =>
 
-                StartCoroutine(EndState(state));
-            
-            })
+                StartCoroutine(EndState())
+
+            )
             .AddTo(gameObject);
 
 
     }
 
-    private IEnumerator EndState(InGameEnum.State state)
+    private IEnumerator EndState()
     {
 
-        if(state == InGameEnum.State.Hit)
+        _player.DeadAnimation();
+        _score.Hide();
+        foreach (var bomb in _bombs)
         {
-            _player.DeadAnimation();
-            _score.Hide();
-            foreach (var bomb in _bombs)
-            {
-                if (bomb._isHitOne == true)
-                    bomb.Explosion();
-            }
-
-            yield return new WaitForSeconds(1f);
-
-            _finishView.SetResultScore(_score.Score);
-            _finishView.ShowAsync().Forget();
-
+            if (bomb._isHitOne == true)
+                bomb.Explosion();
         }
+
+        yield return new WaitForSeconds(1f);
+
+        _finishView.SetResultScore(_score.Score);
+        _finishView.ShowAsync().Forget();
+
 
 
     }
@@ -114,7 +111,7 @@ public class InGamePresenter : MonoBehaviour
     private void SetEvents()
     {
 
-        foreach(var bomb in _bombs)
+        foreach (var bomb in _bombs)
         {
             bomb.AddScoreCallback += () => _score.AddScore();
         }
@@ -126,7 +123,7 @@ public class InGamePresenter : MonoBehaviour
             {
                 _view.FadeOut().Forget();
                 GameStart();
-                
+
             })
             .AddTo(this);
 
@@ -145,7 +142,7 @@ public class InGamePresenter : MonoBehaviour
 
         _model.SetState(InGameEnum.State.Run);
         _score.Show();
-        
+
 
     }
 
@@ -153,7 +150,7 @@ public class InGamePresenter : MonoBehaviour
     {
 
         _bombs = new BombPresenter[InGameConst.NumberOfBombs];
-        for(int i = 0; i < InGameConst.NumberOfBombs; i++)
+        for (int i = 0; i < InGameConst.NumberOfBombs; i++)
         {
             var bombClone = Instantiate(_bombPrefab, _view.BombContainer);
             _bombs[i] = bombClone.GetComponent<BombPresenter>();
@@ -173,19 +170,7 @@ public class InGamePresenter : MonoBehaviour
 
     }
 
-    private void CheckHit()
-    {
 
-        foreach( var bomb in _bombs)
-        {
-            if (bomb.IsHit(_player.X, _player.Y))
-            {
-                _model.SetState(InGameEnum.State.Hit);
-                return;
-            }
-        }
-
-    }
 
 
 
@@ -201,7 +186,10 @@ public class InGamePresenter : MonoBehaviour
 
         _view.ManualUpdate(deltaTime);
 
-        _player.ManualUpdate(deltaTime,_model.State);
+        if (_model.State == InGameEnum.State.WaitStart || _model.State == InGameEnum.State.Run)
+            _player.ManualUpdate(deltaTime,_model.State);
+
+        _model.CheckHit(_bombs, _player.X, _player.Y);
 
         foreach(var bomb in _bombs)
         {
@@ -209,8 +197,6 @@ public class InGamePresenter : MonoBehaviour
                 bomb.ManualUpdate(deltaTime);
         }
            
-
-        CheckHit();
         
 
     }

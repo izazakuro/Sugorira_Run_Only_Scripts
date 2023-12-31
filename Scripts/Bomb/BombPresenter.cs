@@ -24,7 +24,6 @@ public class BombPresenter : MonoBehaviour
     public void Initialize(float time)
     {
 
-        gameObject.SetActive(false);
         _bombModel = new BombModel(time);
         _bombView.Initialize();
         SetEvent();

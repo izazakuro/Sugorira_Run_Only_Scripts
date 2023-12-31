@@ -63,18 +63,16 @@ public class PlayerView : MonoBehaviour
 
     }
 
-    public void ManualUpdate(float deltaTime, InGameEnum.State state)
+    public void ManualUpdate(float deltaTime)
     {
 
-        UpdateView(deltaTime, state);
+        UpdateView(deltaTime);
 
     }
 
-    private void UpdateView(float deltaTime, InGameEnum.State state)
+    private void UpdateView(float deltaTime)
     {
-        if (state == InGameEnum.State.Hit) return;
-
-
+        
         _spriteChangeTimer -= deltaTime;
         if(_spriteChangeTimer < 0f)
         {

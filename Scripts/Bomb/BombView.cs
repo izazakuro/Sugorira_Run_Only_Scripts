@@ -35,6 +35,7 @@ public class BombView : MonoBehaviour
     public void Initialize()
     {
         _cachedTransform = transform;
+        gameObject.SetActive(false);
         Reset();
 
     }

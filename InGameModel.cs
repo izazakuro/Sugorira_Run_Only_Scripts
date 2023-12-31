@@ -37,4 +37,18 @@ public class InGameModel
     }
 
 
+    public void CheckHit(BombPresenter[] _bombs , float X , float Y)
+    {
+
+        foreach (var bomb in _bombs)
+        {
+            if (bomb.IsHit(X, Y))
+            {
+                SetState(InGameEnum.State.Hit);
+                return;
+            }
+        }
+
+    }
+
 }

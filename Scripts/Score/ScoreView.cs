@@ -6,6 +6,9 @@ public class ScoreView : MonoBehaviour
 {
 
     [SerializeField]
+    private Text _scoreNum;
+
+    [SerializeField]
     private Text _scoreText;
 
 
@@ -22,21 +25,22 @@ public class ScoreView : MonoBehaviour
 
         gameObject.SetActive(false);
 
+
     }
 
     public void Show()
     {
 
-        _scoreText.color = new Color(_scoreText.color.r, _scoreText.color.g, _scoreText.color.b, 0);
+        _scoreNum.color = new Color(_scoreText.color.r, _scoreText.color.g, _scoreText.color.b, 0);
         gameObject.SetActive(true);
-        _scoreText.DOFade(1, 2f);
+        _scoreNum.DOFade(1, 2f);
 
     }
 
     public void SetScore(int score)
     {
 
-        _scoreText.text = "Score:" + score.ToString();
+        _scoreNum.text = score.ToString();
 
     }
 
